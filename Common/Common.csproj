@@ -48,6 +48,9 @@
     <Compile Include="BatteryEventArgs.cs" />
     <Compile Include="BatterySubscriber.cs" />
     <Compile Include="CustomException.cs" />
+    <Compile Include="EisFileDiscovery.cs" />
+    <Compile Include="EisFileInfo.cs" />
+    <Compile Include="EisSample.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
