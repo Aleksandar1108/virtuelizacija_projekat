@@ -51,7 +51,9 @@
     <Compile Include="EisFileDiscovery.cs" />
     <Compile Include="EisFileInfo.cs" />
     <Compile Include="EisSample.cs" />
+    <Compile Include="IBatteryStorage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SimpleEisCsvReader.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
