@@ -15,7 +15,7 @@ namespace Server
         private IBatteryStorage storage;
         private string currentSessionDir;
 
-        // Current session data
+      
         private EisMeta currentSession;
         private double? lastVoltage;
         private double? lastImpedance;
@@ -25,12 +25,12 @@ namespace Server
         private int written;
         private readonly object lockObject = new object();
 
-        // Configuration thresholds
+      
         private double tThreshold;
         private double rMin, rMax;
         private double rangeMin, rangeMax;
 
-        // Events according to specification
+     
         public event TransferStartedHandler OnTransferStarted;
         public event SampleReceivedHandler OnSampleReceived;
         public event TransferCompletedHandler OnTransferCompleted;
@@ -43,7 +43,7 @@ namespace Server
 
         public BatteryService()
         {
-            // Load configuration thresholds
+         
             tThreshold = double.Parse(ConfigurationManager.AppSettings["T_threshold"] ?? "2.0", CultureInfo.InvariantCulture);
             rMin = double.Parse(ConfigurationManager.AppSettings["R_min"] ?? "0.001", CultureInfo.InvariantCulture);
             rMax = double.Parse(ConfigurationManager.AppSettings["R_max"] ?? "1000.0", CultureInfo.InvariantCulture);
@@ -52,7 +52,7 @@ namespace Server
 
             PrintWelcomeBanner();
 
-            // Subscribe to own events for logging
+           
             OnTransferStarted += (s, e) =>
             {
                 Console.WriteLine();
@@ -95,7 +95,7 @@ namespace Server
                 Console.WriteLine();
             };
 
-            // Subscribe to specific analytics events
+          
             OnVoltageSpike += (s, e) =>
             {
                 Console.WriteLine();
@@ -129,7 +129,7 @@ namespace Server
                 Console.WriteLine();
             };
 
-            // ANALITIKA 1: Detekcija naglog skoka temperature
+          
             OnTemperatureSpike += (s, e) =>
             {
                 Console.WriteLine();
@@ -141,7 +141,7 @@ namespace Server
                 Console.WriteLine();
             };
 
-            // ANALITIKA 2: Sensor validation events
+         
             OnSensorValidation += (s, e) =>
             {
                 Console.WriteLine();
@@ -196,7 +196,7 @@ namespace Server
                             Value = "null"
                         });
 
-                    // Validate meta-header according to specification
+                   
                     if (string.IsNullOrWhiteSpace(meta.BatteryId))
                         throw new FaultException<ValidationFault>(new ValidationFault
                         {
@@ -247,14 +247,14 @@ namespace Server
 
                     currentSession = meta;
 
-                    // Create storage structure: Data/<BatteryId>/<TestId>/<SoC%>/session.csv
+                  
                     currentSessionDir = Path.Combine(storageRoot, meta.BatteryId, meta.TestId, $"{meta.SocPercent}%");
                     Directory.CreateDirectory(currentSessionDir);
 
                     storage = new BatteryFileStorage(currentSessionDir);
                     storage.InitializeSession(meta);
 
-                    // Reset analytics state
+                 
                     lastVoltage = null;
                     lastImpedance = null;
                     lastTemperature = null;
@@ -273,7 +273,7 @@ namespace Server
                 }
                 catch (FaultException)
                 {
-                    throw; // Re-throw fault exceptions as-is
+                    throw; 
                 }
                 catch (Exception ex)
                 {
@@ -300,7 +300,7 @@ namespace Server
                             Value = "null"
                         });
 
-                    // Validate sample according to specification
+                  
                     if (!ValidateSample(sample, out string validationError))
                     {
                         storage.StoreRejectedSample(validationError, SerializeSample(sample));
@@ -312,10 +312,7 @@ namespace Server
                         });
                     }
 
-                    // ANALITIKA 2: Provera ispravnosti senzora po R i Range
-                    // Potrebno je proveriti da li je senzor ispravan preko vrednosti R i Range
-                    // R < R_min ili R > R_max → ResistanceOutOfBounds
-                    // Range < Range_min ili Range > Range_max → RangeMismatch
+                    
                     if (sample.R_ohm < rMin || sample.R_ohm > rMax)
                     {
                         var sensorEvent = new SensorValidationEventArgs(currentSession.BatteryId, currentSession.TestId,
@@ -334,13 +331,11 @@ namespace Server
                         storage.StoreRejectedSample($"Range_ohm out of bounds: {sample.Range_ohm} not in [{rangeMin}, {rangeMax}]", SerializeSample(sample));
                     }
 
-                    // Store valid sample
+                 
                     storage.StoreSample(sample);
                     written++;
 
-                    // ANALITIKA 1: Detekcija naglog skoka temperature (ΔT)
-                    // Formula: ΔT = T(t) - T(t - Δt)
-                    // Ako je ΔT > Tthreshold, treba podići događaj
+                    
                     if (lastTemperature.HasValue)
                     {
                         double deltaT = sample.T_degC - lastTemperature.Value;
@@ -357,7 +352,7 @@ namespace Server
                     }
                     lastTemperature = sample.T_degC;
 
-                    // ANALITIKA 1: Detekcija naglih promena napona (ΔV)
+                    
                     if (lastVoltage.HasValue)
                     {
                         double deltaV = sample.V - lastVoltage.Value;
@@ -374,7 +369,7 @@ namespace Server
                     }
                     lastVoltage = sample.V;
 
-                    // ANALITIKA 2: Detekcija promene impedanse (ΔZ)
+                   
                     double currentImpedance = sample.CalculateImpedance();
                     if (lastImpedance.HasValue)
                     {
@@ -391,7 +386,7 @@ namespace Server
                         }
                     }
 
-                    // Running mean i ±25% odstupanje
+                    
                     runningMeanImpedance = ((runningMeanImpedance * sampleCount) + currentImpedance) / (sampleCount + 1);
                     sampleCount++;
 
@@ -431,7 +426,7 @@ namespace Server
                 }
                 catch (FaultException)
                 {
-                    throw; // Re-throw fault exceptions as-is
+                    throw; 
                 }
                 catch (Exception ex)
                 {
@@ -475,8 +470,8 @@ namespace Server
                     return new Ack { Success = true, Message = "Session completed", Status = "COMPLETED" };
                 }
                 catch (FaultException)
-                {
-                    throw; // Re-throw fault exceptions as-is
+                { 
+                    throw; 
                 }
                 catch (Exception ex)
                 {
@@ -499,14 +494,14 @@ namespace Server
                 return false;
             }
 
-            // Validate FrequencyHz > 0
+         
             if (sample.FrequencyHz <= 0 || double.IsNaN(sample.FrequencyHz) || double.IsInfinity(sample.FrequencyHz))
             {
                 error = $"Invalid FrequencyHz: {sample.FrequencyHz} (must be positive)";
                 return false;
             }
 
-            // Validate real values for R, X, V
+            
             if (double.IsNaN(sample.R_ohm) || double.IsInfinity(sample.R_ohm))
             {
                 error = $"Invalid R_ohm: {sample.R_ohm}";
@@ -525,14 +520,14 @@ namespace Server
                 return false;
             }
 
-            // Validate monotonic RowIndex increase
+            
             if (sample.RowIndex < 0)
             {
                 error = $"Invalid RowIndex: {sample.RowIndex} (must be non-negative)";
                 return false;
             }
 
-            // Check for required fields
+          
             if (sample.Timestamp == default(DateTime))
             {
                 error = "Invalid Timestamp";

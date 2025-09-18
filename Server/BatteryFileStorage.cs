@@ -26,22 +26,22 @@ namespace Server
         {
             try
             {
-                // Create unique session files with timestamp to avoid overwriting
+                
                 string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
 
-                // Create session.csv for valid samples
+               
                 string sessionFile = Path.Combine(sessionDirectory, $"session_{timestamp}.csv");
                 sessionStream = new FileStream(sessionFile, FileMode.Create, FileAccess.Write, FileShare.Read);
                 sessionWriter = new StreamWriter(sessionStream) { AutoFlush = true };
                 sessionWriter.WriteLine("FrequencyHz,R_ohm,X_ohm,V,T_degC,Range_ohm,RowIndex,Timestamp,Impedance");
 
-                // Create rejects.csv for rejected samples
+                
                 string rejectsFile = Path.Combine(sessionDirectory, $"rejects_{timestamp}.csv");
                 rejectsStream = new FileStream(rejectsFile, FileMode.Create, FileAccess.Write, FileShare.Read);
                 rejectsWriter = new StreamWriter(rejectsStream) { AutoFlush = true };
                 rejectsWriter.WriteLine("Reason,RawData");
 
-                // Create analytics.csv for alerts
+                
                 string analyticsFile = Path.Combine(sessionDirectory, $"analytics_{timestamp}.csv");
                 analyticsStream = new FileStream(analyticsFile, FileMode.Create, FileAccess.Write, FileShare.Read);
                 analyticsWriter = new StreamWriter(analyticsStream) { AutoFlush = true };
@@ -91,11 +91,11 @@ namespace Server
         public void StoreRejectedSample(string reason, string rawData)
         {
             if (rejectsWriter == null)
-                return; // Silently ignore if not initialized
+                return; 
 
             try
             {
-                // Escape commas in reason and rawData
+                
                 string escapedReason = reason?.Replace(",", ";") ?? "Unknown";
                 string escapedData = rawData?.Replace(",", ";") ?? "Unknown";
 
@@ -110,7 +110,7 @@ namespace Server
         public void StoreAnalyticsEvent(string alertType, string message, double value, double threshold)
         {
             if (analyticsWriter == null)
-                return; // Silently ignore if not initialized
+                return;
 
             try
             {
@@ -132,7 +132,7 @@ namespace Server
 
         public void FinalizeSession()
         {
-            // Flush all writers to ensure data is written
+           
             try
             {
                 sessionWriter?.Flush();
