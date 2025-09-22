@@ -21,7 +21,7 @@ namespace Client
                 batteryFactory = new ChannelFactory<IBatteryService>("Battery");
                 batteryProxy = batteryFactory.CreateChannel();
                 
-                // Test connection
+             
                 Console.WriteLine("Testing connection to Battery EIS Analysis service...");
             }
             catch (Exception ex)
@@ -68,16 +68,16 @@ namespace Client
             
             if (string.IsNullOrWhiteSpace(path))
             {
-                // Auto-detect Hioki EIS files from the Dataset/Hioki folder
+             
                 string baseDir = AppDomain.CurrentDomain.BaseDirectory;
                 Console.WriteLine($"Looking for Hioki files from: {baseDir}");
                 
-                // Try multiple possible locations
+              
                 string[] possiblePaths = {
-                    Path.Combine(baseDir, "Dataset", "Hioki"),                    // bin/Debug/Dataset/Hioki
-                    Path.Combine(baseDir, "..", "..", "..", "Dataset", "Hioki"),  // Project/Dataset/Hioki
-                    Path.Combine(baseDir, "..", "..", "Dataset", "Hioki"),       // Battery/Dataset/Hioki
-                    Path.Combine(baseDir, "..", "Dataset", "Hioki")              // Battery/Client/../Dataset/Hioki
+                    Path.Combine(baseDir, "Dataset", "Hioki"),                  
+                    Path.Combine(baseDir, "..", "..", "..", "Dataset", "Hioki"),  
+                    Path.Combine(baseDir, "..", "..", "Dataset", "Hioki"),       
+                    Path.Combine(baseDir, "..", "Dataset", "Hioki")             
                 };
                 
                 string hiokiPath = null;
@@ -100,7 +100,7 @@ namespace Client
                 if (hiokiPath != null)
                 {
                     var hiokiFiles = Directory.GetFiles(hiokiPath, "Hk_*.csv");
-                    // Use the first Hioki file found
+                   
                     path = hiokiFiles[0];
                     Console.WriteLine($"Auto-detected Hioki file: {Path.GetFileName(path)}");
                 }
@@ -136,15 +136,15 @@ namespace Client
 
         private static void ProcessMultipleFiles(IBatteryService batteryProxy)
         {
-            // Look specifically in the Hioki folder for your uploaded files
+           
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             Console.WriteLine($"Looking for multiple Hioki files from: {baseDir}");
             
             string[] possiblePaths = {
-                Path.Combine(baseDir, "Dataset"),                    // bin/Debug/Dataset
-                Path.Combine(baseDir, "..", "..", "..", "Dataset"),  // Project/Dataset
-                Path.Combine(baseDir, "..", "..", "Dataset"),       // Battery/Dataset
-                Path.Combine(baseDir, "..", "Dataset")              // Battery/Client/../Dataset
+                Path.Combine(baseDir, "Dataset"),                    
+                Path.Combine(baseDir, "..", "..", "..", "Dataset"), 
+                Path.Combine(baseDir, "..", "..", "Dataset"),     
+                Path.Combine(baseDir, "..", "Dataset")             
             };
             
             var files = new List<Common.EisFileInfo>();
@@ -200,7 +200,7 @@ namespace Client
                 ProcessEisFile(batteryProxy, fileInfo.FilePath, meta);
                 processed++;
                 
-                if (processed >= 3) // Limit for demo
+                if (processed >= 3) 
                 {
                     Console.WriteLine($"\nProcessed {processed} files (demo limit reached)");
                     break;
@@ -251,7 +251,7 @@ namespace Client
                         if (sent % 10 == 0)
                             Console.Write($"\rSent: {sent}, Success: {successful}, Failed: {failed}");
                         
-                        // Add small delay for real-time streaming effect
+                      
                         System.Threading.Thread.Sleep(10);
                     }
                     Console.WriteLine($"\nClient processed: Accepted={reader.AcceptedCount} Rejected={reader.RejectedCount}");
@@ -285,12 +285,12 @@ namespace Client
 
         private static EisMeta ExtractMetaFromPath(string filePath)
         {
-            // Try to extract battery info from path
+         
             var pathParts = filePath.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             
-            string batteryId = "B01"; // default
-            string testId = "Test_1"; // default
-            int socPercent = 50; // default
+            string batteryId = "B01";
+            string testId = "Test_1";
+            int socPercent = 50; 
             
             for (int i = 0; i < pathParts.Length; i++)
             {
@@ -304,7 +304,7 @@ namespace Client
                 }
             }
             
-            // Try to extract SoC from filename
+            
             string fileName = Path.GetFileNameWithoutExtension(filePath);
             var match = System.Text.RegularExpressions.Regex.Match(fileName, @"(\d+)%?");
             if (match.Success && int.TryParse(match.Groups[1].Value, out int extractedSoc))

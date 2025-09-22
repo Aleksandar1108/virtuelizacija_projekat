@@ -31,23 +31,23 @@ namespace Client
 
             reader = new StreamReader(csvFilePath);
 
-            // Create rejects file directory if needed
+           
             Directory.CreateDirectory(Path.GetDirectoryName(rejectsFilePath));
             rejectsWriter = new StreamWriter(rejectsFilePath, false) { AutoFlush = true };
             rejectsWriter.WriteLine("RowIndex,Reason,RawLine");
 
-            // Skip header if present
+         
             if (!reader.EndOfStream)
             {
                 string firstLine = reader.ReadLine();
-                // Check if first line is a header (contains non-numeric data)
+              
                 if (IsHeaderLine(firstLine))
                 {
                     Console.WriteLine($"Skipped header: {firstLine}");
                 }
                 else
                 {
-                    // Put back the line if it's not a header
+                    
                     reader.BaseStream.Seek(0, SeekOrigin.Begin);
                     reader = new StreamReader(reader.BaseStream);
                 }
@@ -63,12 +63,12 @@ namespace Client
             if (parts.Length < 6)
                 return false;
 
-            // Check for known header patterns
+          
             string firstField = parts[0].Trim().ToLowerInvariant();
             if (firstField.Contains("frequency") || firstField.Contains("freq"))
                 return true;
 
-            // Try to parse first few fields as numbers
+            
             var ci = CultureInfo.InvariantCulture;
             return !double.TryParse(parts[0].Trim(), NumberStyles.Float, ci, out _);
         }
@@ -87,7 +87,7 @@ namespace Client
             {
                 rejectedCount++;
                 rejectsWriter.WriteLine($"{currentRowIndex},Empty line,\"{line}\"");
-                return TryReadNext(out sample); // Try next line
+                return TryReadNext(out sample); 
             }
 
             if (EisSample.TryParseCsv(line, currentRowIndex, out sample, out string error))
@@ -99,7 +99,7 @@ namespace Client
             {
                 rejectedCount++;
                 rejectsWriter.WriteLine($"{currentRowIndex},{error.Replace(',', ';')},\"{line}\"");
-                // Continue to next line on parse error
+               
                 return TryReadNext(out sample);
             }
         }
@@ -116,7 +116,7 @@ namespace Client
 
             try
             {
-                // Method 1: Look for Hioki CSV files directly in basePath
+             
                 var hiokiFiles = Directory.GetFiles(basePath, "Hk_*.csv", SearchOption.AllDirectories);
                 foreach (string csvFile in hiokiFiles)
                 {
@@ -124,8 +124,8 @@ namespace Client
                     {
                         files.Add(new Common.EisFileInfo
                         {
-                            BatteryId = "B01", // Default for Hioki files
-                            TestId = "Test_1", // Default for Hioki files
+                            BatteryId = "B01", 
+                            TestId = "Test_1", 
                             SocPercent = soc,
                             FilePath = csvFile,
                             FileName = Path.GetFileName(csvFile)
@@ -133,7 +133,7 @@ namespace Client
                     }
                 }
 
-                // Method 2: Traditional folder structure (B01, B02, ..., B11)
+             
                 var batteryDirs = Directory.GetDirectories(basePath, "B*", SearchOption.AllDirectories)
                     .Where(dir => System.Text.RegularExpressions.Regex.IsMatch(Path.GetFileName(dir), @"^B\d{2}$"))
                     .ToList();
@@ -142,19 +142,19 @@ namespace Client
                 {
                     string batteryId = Path.GetFileName(batteryDir);
 
-                    // Look for EIS Measurement folders
+                 
                     var eisDirs = Directory.GetDirectories(batteryDir, "*EIS*", SearchOption.AllDirectories);
 
                     foreach (string eisDir in eisDirs)
                     {
-                        // Look for Test_1 or Test_2 folders
+                     
                         var testDirs = Directory.GetDirectories(eisDir, "Test_*", SearchOption.TopDirectoryOnly);
 
                         foreach (string testDir in testDirs)
                         {
                             string testId = Path.GetFileName(testDir);
 
-                            // Find CSV files in test directory
+                          
                             var csvFiles = Directory.GetFiles(testDir, "*.csv", SearchOption.TopDirectoryOnly);
 
                             foreach (string csvFile in csvFiles)
@@ -188,11 +188,11 @@ namespace Client
             soc = 0;
             string fileName = Path.GetFileNameWithoutExtension(filePath);
 
-            // Extract SoC from Hioki filename pattern: "Hk_IFR14500_SoC_50_03-07-2023_20-49"
+          
             var match = System.Text.RegularExpressions.Regex.Match(fileName, @"Hk_.*_SoC_(\d+)_");
             if (match.Success && int.TryParse(match.Groups[1].Value, out soc))
             {
-                // Validate SoC range
+               
                 if (soc >= 5 && soc <= 100)
                     return true;
             }
@@ -205,11 +205,11 @@ namespace Client
             soc = 0;
             string fileName = Path.GetFileNameWithoutExtension(filePath);
 
-            // Try to extract SoC from filename patterns like "5%.csv", "10%.csv", etc.
+         
             var match = System.Text.RegularExpressions.Regex.Match(fileName, @"(\d+)%?");
             if (match.Success && int.TryParse(match.Groups[1].Value, out soc))
             {
-                // Validate SoC range
+             
                 if (soc >= 5 && soc <= 100 && soc % 5 == 0)
                     return true;
             }

@@ -15,7 +15,7 @@ namespace UploadClient
 
             try
             {
-                // Determine dataset path
+               
                 string datasetPath = GetDatasetPath(args);
                 
                 if (!Directory.Exists(datasetPath))
@@ -31,7 +31,7 @@ namespace UploadClient
                 
                 using (var uploader = new BatteryDataUploader(datasetPath))
                 {
-                    // Subscribe to events for progress tracking
+                   
                     uploader.OnUploadStarted += (s, e) => 
                     {
                         Console.WriteLine($"🚀 {e.Message}");
@@ -54,11 +54,11 @@ namespace UploadClient
                         Console.ResetColor();
                     };
 
-                    // Test connection first
+                  
                     uploader.TestConnection();
                     Console.WriteLine();
 
-                    // Ask user for confirmation
+                    
                     Console.WriteLine("Ready to upload all EIS files to the Battery Analysis Service.");
                     Console.WriteLine("Make sure the Server is running before proceeding.");
                     Console.Write("Continue? (y/N): ");
@@ -75,7 +75,7 @@ namespace UploadClient
                     Console.WriteLine("Watch the Server console for voltage and impedance analysis alerts! 🔴");
                     Console.WriteLine();
 
-                    // Start the upload process
+                   
                     uploader.UploadAllBatteryData();
                 }
             }
@@ -103,7 +103,7 @@ namespace UploadClient
 
         private static string GetDatasetPath(string[] args)
         {
-            // Check command line argument first
+           
             if (args.Length > 0 && !string.IsNullOrWhiteSpace(args[0]))
             {
                 string argPath = args[0];
@@ -111,10 +111,10 @@ namespace UploadClient
                     return argPath;
             }
 
-            // Look for the specific Hioki folder with your uploaded CSV files
+          
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             
-            // 1. Project Dataset folder (when running from IDE) - PRIORITY
+         
             string projDataset = Path.Combine(baseDir, "..", "..", "..", "Client", "Dataset");
             if (Directory.Exists(projDataset))
             {
@@ -126,7 +126,7 @@ namespace UploadClient
                 }
             }
 
-            // 2. bin/Debug/Dataset (when running from build output)
+           
             string binDataset = Path.Combine(baseDir, "Dataset");
             if (Directory.Exists(binDataset))
             {
@@ -138,7 +138,7 @@ namespace UploadClient
                 }
             }
 
-            // 3. Look for Dataset folder in parent directories
+           
             DirectoryInfo currentDir = new DirectoryInfo(baseDir);
             while (currentDir != null)
             {
@@ -155,7 +155,7 @@ namespace UploadClient
                 currentDir = currentDir.Parent;
             }
 
-            // 4. Default fallback to project dataset
+          
             string fallbackPath = Path.Combine(baseDir, "..", "..", "..", "Client", "Dataset");
             Console.WriteLine($"Using fallback path: {fallbackPath}");
             return Path.GetFullPath(fallbackPath);

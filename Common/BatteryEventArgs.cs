@@ -87,7 +87,7 @@ namespace Common
         }
     }
 
-    // ANALITIKA 1: Detekcija naglog skoka temperature (ΔT)
+    
     public class TemperatureSpikeEventArgs : BatteryEventArgs
     {
         public double TemperatureChange { get; set; }
@@ -112,7 +112,7 @@ namespace Common
         }
     }
 
-    // ANALITIKA 2: Provera ispravnosti senzora po R i Range
+    
     public class SensorValidationEventArgs : BatteryEventArgs
     {
         public double ActualValue { get; set; }
@@ -136,7 +136,7 @@ namespace Common
         }
     }
 
-    // Delegat tipovi za događaje
+    
     public delegate void TransferStartedHandler(object sender, BatteryEventArgs e);
     public delegate void SampleReceivedHandler(object sender, BatteryEventArgs e);
     public delegate void TransferCompletedHandler(object sender, BatteryEventArgs e);

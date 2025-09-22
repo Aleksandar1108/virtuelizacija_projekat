@@ -20,7 +20,7 @@ namespace Common
 
         public void OnSampleReceived(object sender, BatteryEventArgs e)
         {
-            // Quiet operation for performance
+           
         }
 
         public void OnTransferCompleted(object sender, BatteryEventArgs e)

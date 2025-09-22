@@ -29,15 +29,15 @@ namespace Common
         [DataMember]
         public int RowIndex { get; set; }
 
-        // Dodato za analitiku
+       
         [DataMember]
         public DateTime Timestamp { get; set; }
 
-        // Prema specifikaciji - mora sadržati TimestampLocal
+      
         [DataMember]
         public DateTime TimestampLocal { get; set; }
 
-        // Metoda za računanje impedanse Z = sqrt(R^2 + X^2)
+      
         public double CalculateImpedance()
         {
             return Math.Sqrt(R_ohm * R_ohm + X_ohm * X_ohm);
@@ -54,7 +54,7 @@ namespace Common
                 return false;
             }
 
-            // Split tolerantno: ",", ";" ili tab, i ukloni navodnike
+            
             string cleaned = csvLine.Replace("\"", "");
             string[] parts = cleaned.Split(new[] { ',', ';', '\t' }, StringSplitOptions.None);
 
@@ -68,8 +68,7 @@ namespace Common
 
             try
             {
-                // Parsing EIS data format: FrequencyHz, R_ohm, X_ohm, V, T_degC, Range_ohm
-                // Also supports Hioki format: Frequency(Hz), R(ohm), X(ohm), V(V), T(deg C), Range(Ohm)
+              
                 double frequencyHz = double.Parse(parts[0], NumberStyles.Float, ci);
                 double r_ohm = double.Parse(parts[1], NumberStyles.Float, ci);
                 double x_ohm = double.Parse(parts[2], NumberStyles.Float, ci);
@@ -77,7 +76,7 @@ namespace Common
                 double t_degC = double.Parse(parts[4], NumberStyles.Float, ci);
                 double range_ohm = double.Parse(parts[5], NumberStyles.Float, ci);
 
-                // Validacija
+              
                 if (frequencyHz <= 0)
                 {
                     error = $"FrequencyHz must be positive, got {frequencyHz}";

@@ -28,23 +28,23 @@ namespace Common
 
             reader = new StreamReader(csvFilePath);
 
-            // Create rejects file directory if needed
+         
             Directory.CreateDirectory(Path.GetDirectoryName(rejectsFilePath));
             rejectsWriter = new StreamWriter(rejectsFilePath, false) { AutoFlush = true };
             rejectsWriter.WriteLine("RowIndex,Reason,RawLine");
 
-            // Skip header if present
+            
             if (!reader.EndOfStream)
             {
                 string firstLine = reader.ReadLine();
-                // Check if first line is a header (contains non-numeric data)
+             
                 if (IsHeaderLine(firstLine))
                 {
                     Console.WriteLine($"Skipped header: {firstLine}");
                 }
                 else
                 {
-                    // Put back the line if it's not a header
+                  
                     reader.BaseStream.Seek(0, SeekOrigin.Begin);
                     reader = new StreamReader(reader.BaseStream);
                 }
@@ -60,12 +60,12 @@ namespace Common
             if (parts.Length < 6)
                 return false;
 
-            // Check for known header patterns
+         
             string firstField = parts[0].Trim().ToLowerInvariant();
             if (firstField.Contains("frequency") || firstField.Contains("freq"))
                 return true;
 
-            // Try to parse first few fields as numbers
+         
             var ci = CultureInfo.InvariantCulture;
             return !double.TryParse(parts[0].Trim(), NumberStyles.Float, ci, out _);
         }
@@ -84,7 +84,7 @@ namespace Common
             {
                 rejectedCount++;
                 rejectsWriter.WriteLine($"{currentRowIndex},Empty line,\"{line}\"");
-                return TryReadNext(out sample); // Try next line
+                return TryReadNext(out sample); 
             }
 
             if (EisSample.TryParseCsv(line, currentRowIndex, out sample, out string error))
@@ -96,7 +96,7 @@ namespace Common
             {
                 rejectedCount++;
                 rejectsWriter.WriteLine($"{currentRowIndex},{error.Replace(',', ';')},\"{line}\"");
-                // Continue to next line on parse error
+               
                 return TryReadNext(out sample);
             }
         }
